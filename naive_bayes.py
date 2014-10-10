@@ -19,7 +19,7 @@ def which_bin(value, edges):
     For a set of bin edges, in which bin would you place the value?
     """
     binnum = 0
-    # Note: this implies that if the value falls below lowest edge, it gets put 
+    # Note: this implies that if the value falls below lowest edge, it gets put
     # into the lowest bin.
     for edge in edges[1:(len(edges)-1)]:
         if value <= edge:
@@ -66,8 +66,8 @@ def bin_feature(df, feature, edges):
     """
     For a given data frame, feature name, and set of bin edges, return a tuple
     containing the bin contents of each Cover_Type's distribution for the given
-    feature in the given binning. Divide each bin's contents by the total number
-    of occurrences of that Cover_Type.
+    feature in the given binning. Divide each bin's contents by the total 
+    number of occurrences of that Cover_Type.
     """
     contents = {}
     # Get number of occurrences of the Cover_Types
@@ -88,9 +88,9 @@ def make_distributions(df):
     the value is a 2-tuple:
         {feature label: ((bin edges), {cover type: bin contents, ...,
                                        cover type: bin contents}) }
-    where each "bin contents" in the tuple is the distribution corresponding to a
-    given Cover_Type. "bin edges" are the bin edges shared by each of the "bin
-    contents" in the dictionary sharing the 2-tuple with "bin edges."
+    where each "bin contents" in the tuple is the distribution corresponding to
+    a given Cover_Type. "bin edges" are the bin edges shared by each of the 
+    "bin contents" in the dictionary sharing the 2-tuple with "bin edges."
     """
 
     disttable = {}
@@ -120,7 +120,7 @@ def main():
     fulltrain = pd.read_csv('dat/train.csv')
     fulltrain = cbc.combine_binary_columns(fulltrain) # Combine binary features
     fulltrain = fulltrain.drop(['Id'], axis=1) # Get rid of useless column 
-    # Shift target values down so instead of counting 1 to 7 we now count 0 to 6.
+    # Shift target values down: instead of counting 1 to 7 we now count 0 to 6.
     fulltrain['Cover_Type'] = fulltrain['Cover_Type'].apply(lambda x: x-1) 
 
     percentCV = 0.3 # Fraction of training data for test set
@@ -129,8 +129,8 @@ def main():
                                                     random_state=0)
     cols = fulltrain.columns
     # Put train back into a data frame.
-    train = pd.DataFrame({col: train[:,i] for (col,i) in zip(cols, 
-                                                            xrange(len(cols)))})
+    train = pd.DataFrame({col: train[:,i] for (col,i) in \
+                          zip(cols, xrange(len(cols)))})
     # Put test back into a data frame.
     test = pd.DataFrame({col: test[:,i] for (col,i) in zip(cols, 
                                                            xrange(len(cols)))})

@@ -33,7 +33,8 @@ def combine_wilderness_areas(df = fulltrain):
 def combine_soil_types(df = fulltrain):
     st = df.loc[:,'Soil_Type1':'Soil_Type40']
     stweight = pd.DataFrame(pd.Series([i+1 for i in xrange(40)], 
-                                      index=list(st.columns), name='Soil_Type'))
+                                      index=list(st.columns), 
+                                      name='Soil_Type'))
     return st.dot(stweight)
 
 # Example plot of elevation vs. wilderness area

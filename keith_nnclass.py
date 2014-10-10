@@ -8,9 +8,11 @@ import combine_bin_cols as cbc
 plotscores = False
 plotrates = True
 
-# Make bar graph showing, for each cover type, number of correct predictions next
-# to number of occurrences. This gets called in __main__ when plotscores == True 
-# (and, currently, when neighs == 30 and weights == 'distance'; these conditions #  are totally arbitrary and are only there to limit us to one plot).
+# Make bar graph showing, for each cover type, number of correct predictions 
+# next to number of occurrences. This gets called in __main__ when 
+# plotscores == True (and, currently, when neighs == 30 and 
+# weights == 'distance'; these conditions are totally arbitrary and are only
+#  there to limit us to one plot).
 def scorechart(ypred, ytrue):    
     counts = np.zeros(7)
     hits = np.zeros(7)
@@ -19,7 +21,7 @@ def scorechart(ypred, ytrue):
     labels = []
     for i in xrange(1,8): labels.append('t'+str(i))       
 
-    # Fill arrays of counts per cover type and correct predictions per cover type
+    # Fill arrays of counts per cover type and correct preds per cover type
     for (yp, yt) in zip(ypred, ytrue):
         # Note that yt is {1,2,...,7}, so increment yt - 1 element of array
         counts[yt - 1] += 1        
@@ -30,8 +32,8 @@ def scorechart(ypred, ytrue):
     x = np.arange(len(labels))
     plt.bar(x - wid/2, counts, align='center', width = wid, hatch="\\", 
             label='Total Predictions')
-    plt.bar(x + wid/2, hits, align='center', width = wid, alpha = 0.5, hatch="/",
-            color='g', label='Correct Predictions')
+    plt.bar(x + wid/2, hits, align='center', width = wid, alpha = 0.5, 
+            hatch="/", color='g', label='Correct Predictions')
     plt.xticks(x, labels)
     plt.legend()
     tothits, totcounts = hits.sum(), counts.sum()
@@ -61,8 +63,8 @@ if __name__ == '__main__':
     trainx = fulltrain.drop(['Id','Cover_Type'], axis=1) # Features
     trainy = fulltrain['Cover_Type'] # Target
 
-    # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are just
-    # 2 columns, rather than 44. 
+    # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are 
+    # just 2 columns, rather than 44. 
     trainx = cbc.combine_binary_columns(trainx)
 
     xtraincv, xtestcv, ytraincv, ytestcv = cross_validation.train_test_split(\
