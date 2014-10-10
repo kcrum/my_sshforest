@@ -35,7 +35,7 @@ def scorechart(ypred, ytrue):
     plt.bar(x + wid/2, hits, align='center', width = wid, alpha = 0.5, 
             hatch="/", color='g', label='Correct Predictions')
     plt.xticks(x, labels)
-    plt.legend()
+    plt.legend(loc=4)
     tothits, totcounts = hits.sum(), counts.sum()
     print '%s/%s (%s %%) correct.' % (tothits, totcounts, 
                                       float(tothits)/totcounts)
