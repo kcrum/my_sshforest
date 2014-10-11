@@ -11,8 +11,8 @@ plotrates = True
 # Make bar graph showing, for each cover type, number of correct predictions 
 # next to number of occurrences. This gets called in __main__ when 
 # plotscores == True (and, currently, when neighs == 30 and 
-# weights == 'distance'; these conditions are totally arbitrary and are only
-#  there to limit us to one plot).
+# weights == 'distance'; these conditions #  are totally arbitrary and are only
+# there to limit us to one plot).
 def scorechart(ypred, ytrue):    
     counts = np.zeros(7)
     hits = np.zeros(7)
@@ -49,7 +49,7 @@ def rateplot(uniftest, disttest, uniftrain, disttrain, narr):
     plt.show()
 
 
-if __name__ == '__main__':
+def main():
     #Nneighbors = [2]
     Nneighbors = [1,2,3,4,5,7,10,15,25]
     uniftest = np.zeros( len(Nneighbors) )
@@ -109,3 +109,45 @@ if __name__ == '__main__':
     
     if plotrates:
         rateplot(uniftest, disttest, uniftrain, disttrain, Nneighbors)
+
+
+def submit(neighs = 2, distweight = True, binarycombo = True):
+    # Which weighting?
+    wt = ''
+    if distweight:
+        wt = 'distance'
+    else:
+        wt = 'uniform'
+
+    # Read in data
+    fulltrain = pd.read_csv('dat/train.csv')
+    trainx = fulltrain.drop(['Id','Cover_Type'], axis=1) # Features
+    trainy = fulltrain['Cover_Type'] # Target
+
+    fulltest = pd.read_csv('dat/test.csv')
+    testid = fulltest['Id'] # You'll need to stitch these onto the predictions
+    testx = fulltest.drop(['Id'],axis=1) # Features
+
+    print 'Data reading complete.'
+
+    # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are
+    # just 2 columns, rather than 44.                                          
+    if binarycombo:
+        trainx = cbc.combine_binary_columns(trainx)
+        testx = cbc.combine_binary_columns(testx)
+
+    clf = neighbors.KNeighborsClassifier(neighs, weights=wt)
+    print 'Training with %s weighting for %s neighbors.' % (wt, neighs)
+    # Fit classifier with training set
+    clf.fit(trainx, trainy)
+    # Predict on test set
+    ypred = clf.predict(testx)
+
+    # Write prediction to file with Kaggle-approved format
+    output = pd.Series(ypred, index=testid, name='Cover_Type')
+    outname = 'output/%sWeight%sNeighborsCBC.csv' % (wt, neighs)
+    output.to_csv(outname, header=True)
+
+if __name__ == '__main__':
+    #main()
+    submit()
