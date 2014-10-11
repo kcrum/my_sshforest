@@ -17,7 +17,7 @@ def submit():
     testid = fulltest['Id'] # You'll need to stitch these onto the predictions
     testx = fulltest.drop(['Id'],axis=1) # Features
 
-    # Create and fit SVM
+    # Create and fit random forest
     clf = ensemble.RandomForestClassifier()
     clf.fit(trainx, trainy)
     
