@@ -136,21 +136,6 @@ def main():
 
     return neurnet
 
-def test():
-    nisttrain, nistvalid, nisttest = mnist_loader.load_data_wrapper(nielsen_path + 'data/mnist.pkl.gz')
-
-    print 'nisttrain.shape: ', np.asarray(nisttrain).shape
-    print 'nisttest.shape: ', np.asarray(nisttest).shape
-    print 'nisttrain[0][0].shape: ', np.asarray(nisttrain)[0][0].shape
-    print 'nisttrain[0][1].shape: ', np.asarray(nisttrain)[0][1].shape
-    print (np.asarray(nisttrain)[0][0].shape)[0]
-    
-    neurnet2 = nielsen_net.Network([(np.asarray(nisttrain)[0][0].shape)[0], 
-                                    nhidden, 10])
-
-    neurnet2.SGD(nisttrain, nepochs, nbatch, eta, test_data=nisttest)
-    
-
 
 if __name__ == '__main__':
     if Debug:
