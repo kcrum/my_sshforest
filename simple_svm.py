@@ -3,10 +3,15 @@ import numpy as np
 import pandas as pd
 from sklearn import cross_validation, svm, preprocessing
 import matplotlib.pyplot as plt
-from keith_nnclass import scorechart
+import sshforest_utilities as util
+
+### These will hopefully make your plots prettier.
+#from mpltools import style
+#style.use('ggplot')
 
 # What fraction of fulltrain do you want to be your test set?
 percentCV = 0.3
+
 
 def main():
     starttime = time.time()
@@ -53,7 +58,7 @@ def main():
     endtime = time.time() - starttime
     print 'Finished at %s seconds.' % "{:.1f}".format(endtime)
     
-    scorechart(ypred, ytestcv)
+    util.scorechart(ypred, ytestcv)
     
 
 #####

@@ -3,44 +3,10 @@ import pandas as pd
 from sklearn import neighbors
 from sklearn import cross_validation
 import matplotlib.pyplot as plt
-import combine_bin_cols as cbc
+import sshforest_utilities as util
 
 plotscores = False
-plotrates = True
-
-# Make bar graph showing, for each cover type, number of correct predictions 
-# next to number of occurrences. This gets called in __main__ when 
-# plotscores == True (and, currently, when neighs == 30 and 
-# weights == 'distance'; these conditions #  are totally arbitrary and are only
-# there to limit us to one plot).
-def scorechart(ypred, ytrue):    
-    counts = np.zeros(7)
-    hits = np.zeros(7)
-
-    # X-axis labels
-    labels = []
-    for i in xrange(1,8): labels.append('t'+str(i))       
-
-    # Fill arrays of counts per cover type and correct preds per cover type
-    for (yp, yt) in zip(ypred, ytrue):
-        # Note that yt is {1,2,...,7}, so increment yt - 1 element of array
-        counts[yt - 1] += 1        
-        if yp == yt: 
-            hits[yt - 1] += 1
-
-    wid = 0.4
-    x = np.arange(len(labels))
-    plt.bar(x - wid/2, counts, align='center', width = wid, hatch="\\", 
-            label='Total Predictions')
-    plt.bar(x + wid/2, hits, align='center', width = wid, alpha = 0.5, 
-            hatch="/", color='g', label='Correct Predictions')
-    plt.xticks(x, labels)
-    plt.legend(loc=4)
-    tothits, totcounts = hits.sum(), counts.sum()
-    print '%s/%s (%s %%) correct.' % (tothits, totcounts, 
-                                      float(tothits)/totcounts)
-    plt.show()          
- 
+plotrates = True 
 
 # Make graph of success rates. Called when plotrates == True.
 def rateplot(uniftest, disttest, uniftrain, disttrain, narr):
@@ -65,7 +31,7 @@ def main():
 
     # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are 
     # just 2 columns, rather than 44. 
-    trainx = cbc.combine_binary_columns(trainx)
+    trainx = util.combine_binary_columns(trainx)
 
     xtraincv, xtestcv, ytraincv, ytestcv = cross_validation.train_test_split(\
         trainx, trainy, test_size=percentCV, random_state=0)
@@ -102,7 +68,7 @@ def main():
                 disttrain[cntr] = trainscore
 
             if plotscores and neighs == 30 and weights == 'distance':  
-                scorechart(ytestpred, ytestcv)
+                util.scorechart(ytestpred, ytestcv)
         cntr += 1
 
     print '-'*50
@@ -133,8 +99,8 @@ def submit(neighs = 2, distweight = True, binarycombo = True):
     # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are
     # just 2 columns, rather than 44.                                          
     if binarycombo:
-        trainx = cbc.combine_binary_columns(trainx)
-        testx = cbc.combine_binary_columns(testx)
+        trainx = util.combine_binary_columns(trainx)
+        testx = util.combine_binary_columns(testx)
 
     clf = neighbors.KNeighborsClassifier(neighs, weights=wt)
     print 'Training with %s weighting for %s neighbors.' % (wt, neighs)
@@ -149,5 +115,5 @@ def submit(neighs = 2, distweight = True, binarycombo = True):
     output.to_csv(outname, header=True)
 
 if __name__ == '__main__':
-    #main()
-    submit()
+    main()
+    #submit()
