@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn import cross_validation
 import matplotlib.pyplot as plt
-import combine_bin_cols as cbc
-from keith_nnclass import scorechart
+import sshforest_utilities as util
+
 
 def var_counts(df, var):
     """
@@ -118,7 +118,7 @@ def make_distributions(df):
 # Main
 def main():
     fulltrain = pd.read_csv('dat/train.csv')
-    fulltrain = cbc.combine_binary_columns(fulltrain) # Combine binary features
+    fulltrain = util.combine_binary_columns(fulltrain) # Combine binary inputs
     fulltrain = fulltrain.drop(['Id'], axis=1) # Get rid of useless column 
     # Shift target values down: instead of counting 1 to 7 we now count 0 to 6.
     fulltrain['Cover_Type'] = fulltrain['Cover_Type'].apply(lambda x: x-1) 
@@ -143,7 +143,7 @@ def main():
     ncovertypes = len(np.unique(fulltrain.Cover_Type))
     ypred = dist_lookup(testx, disttable)
 
-    scorechart(ypred, testy)
+    util.scorechart(ypred, testy)
 
 #####
 if __name__ == '__main__':

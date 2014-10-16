@@ -5,10 +5,6 @@ from sklearn import cross_validation, svm, preprocessing
 import matplotlib.pyplot as plt
 import sshforest_utilities as util
 
-### These will hopefully make your plots prettier.
-#from mpltools import style
-#style.use('ggplot')
-
 # What fraction of fulltrain do you want to be your test set?
 percentCV = 0.3
 
@@ -45,6 +41,7 @@ def main():
     xtestcv = np.hstack((testfloats,testbinaries))
     
     trainstart = time.time()
+    print 'Begin fitting classifier...'
     # Create and fit SVM
     clf = svm.SVC(gamma=0.7)
     clf.fit(xtraincv, ytraincv)

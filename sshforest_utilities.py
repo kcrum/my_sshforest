@@ -43,6 +43,7 @@ def scorechart(ypred, ytrue):
             label='Total Predictions', alpha = 0.5, hatch="\\")
     plt.bar(x + wid/2, hits, align='center', width = wid, alpha = 0.5,
             hatch="/", color='g', label='Correct Predictions')
+    plt.xlabel('Forest Cover Types')
     plt.xticks(x, labels)
     plt.legend(loc=4)
     tothits, tottruecounts = hits.sum(), truecounts.sum()
@@ -58,14 +59,18 @@ def decision_boundaries(var1, var2, clf, features, target, npts=200):
     the classifier "clf" to be untrained. clf is trained in this function
     using var1 and var2 of the "feature/target" set.
     """
+    print 'Training classifier...'
     clf.fit(features[[var1, var2]].values, target)
+    print 'Training done.'
     xmin, xmax = features[var1].min()-1, features[var1].max()+1
     ymin, ymax = features[var2].min()-1, features[var2].max()+1
 
     # Make mesh grid for decision contour plot
     xx, yy = np.meshgrid(np.linspace(xmin, xmax, num=npts),
                          np.linspace(ymin, ymax, num=npts))
+    print 'Building decision contours...'
     z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    print 'Contours done.'
     z = z.reshape(xx.shape)
 
     # Plot the decision contours
@@ -189,18 +194,19 @@ def rescale_trainx(dftrainx):
 
 
 if __name__ == '__main__':
-    #from sklearn import neighbors
+    from sklearn import neighbors
     #from sklearn import ensemble
-    from sklearn import svm
+    #from sklearn import svm
 
     fulltrain = pd.read_csv('dat/train.csv')
     trainx = fulltrain.drop(['Id','Cover_Type'], axis=1) # Features
     trainy = fulltrain['Cover_Type'] # Target
 
-    #clf = neighbors.KNeighborsClassifier(4, weights='distance')
+    clf = neighbors.KNeighborsClassifier(4, weights='distance')
     #clf = ensemble.RandomForestClassifier()
-    clf = svm.SVC(gamma=0.7)
-    trainx = rescale_trainx(trainx)
+
+    #clf = svm.SVC(gamma=0.7)
+    #trainx = rescale_trainx(trainx)
 
     var1 = 'Elevation'
     var2 = 'Horizontal_Distance_To_Hydrology'
