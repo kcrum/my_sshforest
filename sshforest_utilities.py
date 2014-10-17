@@ -11,6 +11,21 @@ style.use('ggplot')
 
 fulltrainpath='dat/train.csv'
 
+
+def try_profile(func):
+    """
+    This allows you to leave a decorator for "kernprof" in your code,
+    regardless of whether or not you end up calling it with kernprof. You
+    should now add @try_profile instead of @profile before the function you
+    would like to profile.
+    """
+    try:
+        wrapped = profile(func)
+    except NameError:
+        wrapped = func
+    return wrapped
+
+
 def scorechart(ypred, ytrue):
     """
     Make bar graph showing, for each cover type, number of correct predictions
@@ -99,6 +114,7 @@ def decision_boundaries(var1, var2, clf, features, target, npts=200):
 
     plt.show()
 
+
 def combine_binary_columns(df):
     """
     This returns your full dataframe with Wilderness_Area columns combined and
@@ -114,7 +130,6 @@ def combine_binary_columns(df):
     # Add on combined columns
     df['Wilderness_Area'] = wildareas
     df['Soil_Type'] = soiltypes
-
     return df
 
 
