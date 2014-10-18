@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pandas as pd
 from sklearn import neighbors
@@ -85,6 +86,7 @@ def main():
 
 
 def submit(neighs = 2, distweight = True, binarycombo = True):
+    starttime = time.time()
     # Which weighting?
     wt = ''
     if distweight:
@@ -106,6 +108,7 @@ def submit(neighs = 2, distweight = True, binarycombo = True):
     # Re-scale features so they all have mean = 0, stddev = 1 (except for
     # qualitative features, which are -1 or 1).
     trainx = util.rescale_trainx(trainx)
+    testx = util.rescale_trainx(testx)
 
     # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are
     # just 2 columns, rather than 44.                                          
@@ -126,6 +129,13 @@ def submit(neighs = 2, distweight = True, binarycombo = True):
     outname = 'output/%sWeight%sNeighborsCBC.csv' % (wt, neighs)
     print 'Done. Writing output to: %s' % outname
     output.to_csv(outname, header=True)
+    
+    endtime = time.time() - starttime
+    print 'Elapsed time: %s seconds' % "{:.1f}".format(endtime)
 
 if __name__ == '__main__':
     main()
+    #submit(neighs=4, distweight=True, binarycombo=False)
+    #submit(neighs=2, distweight=False, binarycombo=False)
+    #submit(neighs=3, distweight=True, binarycombo=False)
+    #submit(neighs=3, distweight=False, binarycombo=False)
