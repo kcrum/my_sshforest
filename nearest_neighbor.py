@@ -10,8 +10,11 @@ plotrates = True
 
 # Make graph of success rates. Called when plotrates == True.
 def rateplot(uniftest, disttest, uniftrain, disttrain, narr):
-    plt.plot(narr, uniftest, 'bs', narr, disttest, 'g^', 
-             narr, uniftrain, 'bs', narr, disttrain, 'g^')
+    plt.plot(narr, uniftrain, 'b^', label='Uniform-weighted train')
+    plt.plot(narr, uniftest, 'bs', label='Uniform-weighted test')
+    plt.plot(narr, disttrain, 'g^', label='Distance-weighted train')
+    plt.plot(narr, disttest, 'gs', label='Distance-weighted test')
+    plt.legend(numpoints=1)
     plt.show()
 
 
@@ -28,6 +31,10 @@ def main():
     fulltrain = pd.read_csv('dat/train.csv')
     trainx = fulltrain.drop(['Id','Cover_Type'], axis=1) # Features
     trainy = fulltrain['Cover_Type'] # Target
+
+    # Re-scale features so they all have mean = 0, stddev = 1 (except 
+    # qualitative features, which are -1 or 1).
+    trainx = util.rescale_trainx(trainx)
 
     # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are 
     # just 2 columns, rather than 44. 
@@ -96,6 +103,10 @@ def submit(neighs = 2, distweight = True, binarycombo = True):
 
     print 'Data reading complete.'
 
+    # Re-scale features so they all have mean = 0, stddev = 1 (except for
+    # qualitative features, which are -1 or 1).
+    trainx = util.rescale_trainx(trainx)
+
     # Combine 'Soil_Type' columns and 'Wilderness_Type' columns so they are
     # just 2 columns, rather than 44.                                          
     if binarycombo:
@@ -106,14 +117,15 @@ def submit(neighs = 2, distweight = True, binarycombo = True):
     print 'Training with %s weighting for %s neighbors.' % (wt, neighs)
     # Fit classifier with training set
     clf.fit(trainx, trainy)
+    print 'Predicting on test set...'
     # Predict on test set
     ypred = clf.predict(testx)
-
+    
     # Write prediction to file with Kaggle-approved format
     output = pd.Series(ypred, index=testid, name='Cover_Type')
     outname = 'output/%sWeight%sNeighborsCBC.csv' % (wt, neighs)
+    print 'Done. Writing output to: %s' % outname
     output.to_csv(outname, header=True)
 
 if __name__ == '__main__':
     main()
-    #submit()
