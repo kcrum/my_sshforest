@@ -12,4 +12,8 @@ from the command line (here "somealgo.py" corresponds to one of the classifiers 
 The neural net in "nielsen_net.py" depends on sample code by Michael Nielsen, shared [here](https://github.com/mnielsen/neural-networks-and-deep-learning) on github. Currently you can't simply fork this repository and call "nielsen_net.py" without setting up Nielsen's code on your machine. 
 
 ## sshforest_utilities.py
-This contains a few useful plotting 
+This contains a few useful plotting and munging functions. Calling
+```
+python sshforest_utilities.py
+```
+will make a cool pair of plots. One plot shows the contours of a distance-weighted 4 nearest neighbors classifier on 'Elevation' vs 'Horizontal_Distance_To_Hydrology' axes. The adjacent plot shows the distribution of training data over these same axes.
