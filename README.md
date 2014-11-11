@@ -8,10 +8,10 @@ python somealgo.py
 ```
 from the command line (here "somealgo.py" corresponds to one of the classifiers in this repository). The following pieces of code contain a classifier that can be called this way:
 
--"naive_bayes.py"
--"nearest_neighbor.py"
--"simple_forest.py"
--"simple_svm.py"
+- "naive_bayes.py"
+- "nearest_neighbor.py"
+- "simple_forest.py"
+- "simple_svm.py"
 
 The best performing of these algorithms is "simple_forest.py," which is an random forest pulled straight out of the box from scikit-learn.
 
