@@ -62,8 +62,9 @@ def scorechart(ypred, ytrue):
     plt.xticks(x, labels)
     plt.legend(loc=4)
     tothits, tottruecounts = hits.sum(), truecounts.sum()
-    print '%s/%s (%s %%) correct.' % (tothits, tottruecounts,
-                                      float(tothits)/tottruecounts)
+    fracright = "{0:.2f}".format(100.*float(tothits)/tottruecounts)
+    print '%s/%s (%s %%) correct.' % (tothits, tottruecounts, fracright)
+
     plt.show()
 
 

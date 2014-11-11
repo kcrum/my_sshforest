@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pandas as pd
 from sklearn import cross_validation
@@ -31,7 +32,7 @@ def which_bin(value, edges):
 
 def dist_lookup(df, disttable):
     """
-    Return array of predicted Cover_Types from test df. 
+    Return array of predicted Cover_Types from test df. THIS IS SLOW!
     """
     # Get number of Cover_Types.
     ncovertypes = len(disttable['Soil_Type'][1])
@@ -117,6 +118,8 @@ def make_distributions(df):
 
 # Main
 def main():
+    starttime = time.time()
+
     fulltrain = pd.read_csv('dat/train.csv')
     fulltrain = util.combine_binary_columns(fulltrain) # Combine binary inputs
     fulltrain = fulltrain.drop(['Id'], axis=1) # Get rid of useless column 
@@ -138,10 +141,19 @@ def main():
     testy = test['Cover_Type'] # Target
     testx = test.drop(['Cover_Type'], axis=1) # Features
 
+    trainstart = time.time()
+    print 'Begin fitting classifier...'
+
     disttable = make_distributions(train)
+
+    traintime = time.time() - trainstart
+    print 'Fit took %s seconds.' % "{:.1f}".format(traintime)
 
     ncovertypes = len(np.unique(fulltrain.Cover_Type))
     ypred = dist_lookup(testx, disttable)
+
+    endtime = time.time() - starttime
+    print 'Finished at %s seconds.' % "{:.1f}".format(endtime)
 
     util.scorechart(ypred, testy)
 

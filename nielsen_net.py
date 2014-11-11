@@ -6,15 +6,17 @@ from sklearn import cross_validation, preprocessing
 nielsen_path = '/home/kcrum/coding_space/neural-networks-and-deep-learning/'
 sys.path.insert(0, nielsen_path + 'code')
 # The previous line allows you to import the network class.                 
-import mynetwork as nielsen_net
+#import mynetwork as nielsen_net
+import network2 as nielsen_net
 import mnist_loader
 
 percentCV = 0.3 # Fraction of training data for cross-validation
-nhidden = 30    # Number of neurons in hidden layer
+nhidden = 50    # Number of neurons in hidden layer
 nclasses = 7    # Number of output classes
-nbatch = 1     # Size of mini-batches
-nepochs = 10    # Number of epochs
-eta = 1.       # Learning rate (at eta = 1000, epochs stuck at 659/4536)
+nbatch = 10     # Size of mini-batches (smaller -> more precise)
+nepochs = 30    # Number of epochs
+eta = 0.05      # Learning rate (at eta = 1000, epochs stuck at 659/4536)
+lmbda = 5.0
 
 Debug=False
 
@@ -124,17 +126,59 @@ def main():
 
     trainarr = train_pd_to_nielsen(xtraincv, ytraincv, ytraincv.max())
     testarr = test_pd_to_nielsen(xtestcv, ytestcv)    
+    
+    neurnet = nielsen_net.Network([(xtraincv.shape)[1], nhidden, nclasses], 
+                                  cost=nielsen_net.CrossEntropyCost)
+    print neurnet.SGD(trainarr, nepochs, nbatch, eta, lmbda=lmbda,
+                      evaluation_data=testarr, monitor_evaluation_cost=True,
+                      monitor_evaluation_accuracy=True)
 
-    #print 'train.shape: ', np.asarray(trainarr).shape
-    #print 'test.shape: ', np.asarray(testarr).shape
-    #print 'train[0][0].shape: ', np.asarray(trainarr)[0][0].shape
-    #print 'train[0][1].shape: ', np.asarray(trainarr)[0][1].shape
-    #print (xtraincv.shape)[1]
+    # ONLY CALL THIS WHEN USING mynetwork.py
+    #print neurnet.SGD(trainarr, nepochs, nbatch, eta)
+    #print neurnet.evaluate(test_data=testarr)
 
-    neurnet = nielsen_net.Network([(xtraincv.shape)[1], nhidden, nclasses])
-    neurnet.SGD(trainarr, nepochs, nbatch, eta, test_data=testarr)
 
-    return neurnet
+def nneurons_test(nneurons):
+
+    fulltrain = pd.read_csv('dat/train.csv')
+    # Read in data
+    trainx = fulltrain.drop(['Id','Cover_Type'], axis=1) # Features
+    trainy = fulltrain['Cover_Type'].apply(lambda x: x-1) # Target
+    
+    # Split data for cross-validation 
+    xtraincv, xtestcv, ytraincv, ytestcv = cross_validation.train_test_split(\
+        trainx, trainy, test_size=percentCV, random_state=0)
+    
+    # xtraincv[:,:10] # <---- Non-binary columns
+    # xtraincv[:,10:] # <---- Binary columns
+    trainfloats = xtraincv[:,:10].astype(float)
+    trainbinaries = xtraincv[:,10:]
+    testfloats = xtestcv[:,:10].astype(float)
+    testbinaries = xtestcv[:,10:]
+
+    # Rescale all continuous features to have mean = 0 and stddev = 1.
+    trainfloats = preprocessing.scale(trainfloats)
+    testfloats = preprocessing.scale(testfloats)
+    # Rescale all binaries to be -1 or 1
+    trainbinaries = trainbinaries*2 - 1
+    testbinaries = testbinaries*2 - 1
+
+    # Reattach binary and float columns
+    xtraincv = np.hstack((trainfloats,trainbinaries))
+    xtestcv = np.hstack((testfloats,testbinaries))
+
+    trainarr = train_pd_to_nielsen(xtraincv, ytraincv, ytraincv.max())
+    testarr = test_pd_to_nielsen(xtestcv, ytestcv)    
+
+    nsuccess = {}
+
+    for n in nneurons:    
+        neurnet = nielsen_net.Network([(xtraincv.shape)[1], n, nclasses])
+        neurnet.SGD(trainarr, nepochs, nbatch, eta)
+
+        nsuccess[n] = neurnet.evaluate(test_data=testarr, plotbool=False)
+
+    print nsuccess
 
 
 if __name__ == '__main__':
@@ -142,6 +186,6 @@ if __name__ == '__main__':
         #test()
         convert_test()
     else:
-        main()
-
+        main()        
+        #nneurons_test([30,40,50,60,70])
     
