@@ -6,7 +6,14 @@ This repository contains some algorithms which attempt to solve this classificat
 ```
 python somealgo.py
 ```
-from the command line (here "somealgo.py" corresponds to one of the classifiers in this repository).
+from the command line (here "somealgo.py" corresponds to one of the classifiers in this repository). The following pieces of code contain a classifier that can be called this way:
+
+-"naive_bayes.py"
+-"nearest_neighbor.py"
+-"simple_forest.py"
+-"simple_svm.py"
+
+The best performing of these algorithms is "simple_forest.py," which is an random forest pulled straight out of the box from scikit-learn.
 
 ## nielsen_net.py
 The neural net in "nielsen_net.py" depends on sample code by Michael Nielsen, shared [here](https://github.com/mnielsen/neural-networks-and-deep-learning) on github. Currently you can't simply fork this repository and call "nielsen_net.py" without setting up Nielsen's code on your machine. 
