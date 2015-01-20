@@ -27,7 +27,7 @@ def submit():
         trainx = util.combine_binary_columns(trainx)
         testx = util.combine_binary_columns(testx)        
 
-    # Create and fit SVM
+    # Create and fit random forest
     clf = ensemble.RandomForestClassifier()
     clf.fit(trainx, trainy)
 

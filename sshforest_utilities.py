@@ -10,7 +10,14 @@ from mpltools import style
 style.use('ggplot')
 
 fulltrainpath='dat/train.csv'
+covertypes = {1:'Spruce/Fir', 2:'Lodgepole Pine', 3:'Ponderosa Pine',
+              4:'Cottonwood/Willow', 5:'Aspen', 6:'Douglas-fir', 7:'Krummholz'}
 
+featureunits = {'Elevation':'m', 'Aspect':'deg', 'Slope':'deg', 
+                'Horizontal_Distance_To_Hydrology':'m',
+                'Vertical_Distance_To_Hydrology':'m',
+                'Horizontal_Distance_To_Roadways':'m',
+                'Horizontal_Distance_To_Fire_Points':'m'}
 
 def try_profile(func):
     """
@@ -68,7 +75,7 @@ def scorechart(ypred, ytrue):
     plt.show()
 
 
-def decision_boundaries(var1, var2, clf, features, target, npts=200):
+def decision_surface(var1, var2, clf, features, target, npts=200):
     """
     Plot the decision boundaries in the "var1-var2" plane, where the user
     passes two strings specifying these two variables. Note that this expects
@@ -91,6 +98,8 @@ def decision_boundaries(var1, var2, clf, features, target, npts=200):
 
     # Plot the decision contours
     fig, (ax1,ax2) = plt.subplots(1,2)
+    plt.subplots_adjust(left=0.1, right=0.68, top=0.92, bottom=0.08)
+
     ax1.contourf(xx, yy, z, cmap=plt.cm.Paired, alpha=0.8)
     ax1.set_xlabel(var1.replace('_',' ')) # Calls to replace get rid of ugly
     # underscores in the axes titles.
@@ -109,9 +118,11 @@ def decision_boundaries(var1, var2, clf, features, target, npts=200):
     ax2.set_xlim(xx.min(), xx.max())
     ax2.set_ylim(yy.min(), yy.max())
     ax2.set_frame_on(True)
+    ax2.yaxis.tick_right()
+    ax2.yaxis.set_label_position('right')
     #ax2.set_xticks(())
     #ax2.set_yticks(())
-    ax2.set_title('Data Scatter Plot')
+    ax2.set_title('Training Data Scatter Plot')
 
     plt.show()
 
@@ -184,6 +195,7 @@ def elevation_vs_soil(dfpath = fulltrainpath):
     plt.xlim(0,41)
     plt.show()
 
+
 def rescale_trainx(dftrainx):
     """
     Takes in training data (without 'Cover_Type' column) and rescales 
@@ -207,6 +219,71 @@ def rescale_trainx(dftrainx):
     trainx = np.hstack((trainfloats,trainbinaries))
 
     return pd.DataFrame(trainx, index=indices, columns=cols)
+
+# Make a nice scatter plot of cover types in two feature dimensions.
+def labeled_plot(var1, var2, fulltrain, pointsize=20):
+    fig, ax = plt.subplots()
+    plt.subplots_adjust(left=0.1, right=0.68, top=0.92, bottom=0.08)
+
+    for key,color in zip(covertypes.keys(), plt.rcParams['axes.color_cycle']):
+        # If plotting against Soil_Type or Wilderness_Area, offset Cover_Types
+        # so points don't overlap so much.
+        if var1 == 'Soil_Type' or var1 == 'Wilderness_Area':
+            offset1 = 0.05*(key - 4.)
+        else: offset1 = 0
+        if var2 == 'Soil_Type' or var2 == 'Wilderness_Area':
+            offset2 = 0.05*(key - 4.)
+        else: offset2 = 0
+
+        # Plot only one Cover_Type 
+        onetype = fulltrain[fulltrain.Cover_Type==key]        
+        ax.scatter(onetype[var1]+offset1, onetype[var2]+offset2, color=color, 
+                   label=covertypes[key], s=pointsize)
+
+    # If plotting against Soil_Type or Wilderness_Area, add some padding to 
+    # axis limits.
+    if var1 == 'Soil_Type' or var1 == 'Wilderness_Area':
+        ax.set_xlim(min(fulltrain[var1])-0.3, max(fulltrain[var1])+0.3)
+    else: ax.set_xlim(min(fulltrain[var1]), max(fulltrain[var1]))
+    if var2 == 'Soil_Type' or var2 == 'Wilderness_Area':
+        ax.set_ylim(min(fulltrain[var2])-0.3, max(fulltrain[var2])+0.3)
+    else: ax.set_ylim(min(fulltrain[var2]), max(fulltrain[var2]))
+
+    # Get units of each feature
+    if var1 in featureunits.keys(): unit1 = '[%s]' % featureunits[var1]
+    else: unit1 = ''
+    if var2 in featureunits.keys(): unit2 = '[%s]' % featureunits[var2]
+    else: unit2 = ''
+
+    # Set axis labels and title. Remove underscore, add units when possible.
+    ax.set_xlabel('%s %s'% (var1.replace('_',' '),unit1), fontsize=16) # Calls
+    # to replace get rid of ugly underscores in the axes titles.
+    ax.set_ylabel('%s %s'% (var2.replace('_',' '),unit2), fontsize=16)
+    ax.set_title('%s vs. %s'%(var2.replace('_',' '),var1.replace('_',' ')),
+                 fontsize=20)
+    legend = ax.legend(bbox_to_anchor=(1.05, 1), scatterpoints=1, loc=2, 
+                       borderaxespad=0., prop={'size':16})
+    # Set plot background and legend background to white
+    ax.set_axis_bgcolor('white')
+    plt.setp(ax.spines.values(), color='grey')
+    plt.grid(b=True, which='both', color='grey', linestyle=':')
+    #plt.setp([ax.get_xticklines(), ax.get_yticklines()], color='black')
+    legend.get_frame().set_facecolor('white')
+
+    # Set tick labels if plotting Wilderness Area
+    if var1 == 'Wilderness_Area':
+        ax.xaxis.set_ticks(range(1,5))
+        fig.canvas.draw()
+        ax.set_xticklabels( [ ('Area %s' % num) for num in range(1,5) ] )
+    if var2 == 'Wilderness_Area':
+        ax.yaxis.set_ticks(range(1,5))
+        fig.canvas.draw()
+        ax.set_yticklabels( [ ('Area %s' % num) for num in range(1,5) ] )
+
+    # Increase tick label font size
+    ax.tick_params(axis='both', which='major', labelsize=14)
+
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -232,4 +309,4 @@ if __name__ == '__main__':
     #var2 = 'Vertical_Distance_To_Hydrology'
     #var1 = 'Hillshade_Noon'    
     #var2 = 'Hillshade_9am'
-    decision_boundaries(var1, var2, clf, trainx, trainy)
+    decision_surface(var1, var2, clf, trainx, trainy)
