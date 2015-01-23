@@ -267,7 +267,6 @@ def labeled_plot(var1, var2, fulltrain, pointsize=20):
     ax.set_axis_bgcolor('white')
     plt.setp(ax.spines.values(), color='grey')
     plt.grid(b=True, which='both', color='grey', linestyle=':')
-    #plt.setp([ax.get_xticklines(), ax.get_yticklines()], color='black')
     legend.get_frame().set_facecolor('white')
 
     # Set tick labels if plotting Wilderness Area
