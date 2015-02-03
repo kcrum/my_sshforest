@@ -225,6 +225,11 @@ def labeled_plot(var1, var2, fulltrain, pointsize=20):
     fig, ax = plt.subplots()
     plt.subplots_adjust(left=0.1, right=0.68, top=0.92, bottom=0.08)
 
+    # Combine 'Soil_Type' and 'Wilderness_Area' columns into one variable if 
+    # either of these qualitative variables is called.
+    if 'Soil_Type' in (var1,var2) or 'Wilderness_Area' in (var1,var2):
+        fulltrain = combine_binary_columns(fulltrain)
+
     for key,color in zip(covertypes.keys(), plt.rcParams['axes.color_cycle']):
         # If plotting against Soil_Type or Wilderness_Area, offset Cover_Types
         # so points don't overlap so much.
